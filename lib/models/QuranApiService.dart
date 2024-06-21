@@ -1,47 +1,27 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:quranapp/models/Surah_en_response_model.dart';
+import 'package:quranapp/models/Surah_response_model.dart';
 
 class QuranApiService {
-  static Future<List<dynamic>> fetchQuranArabicInfo(String surahNumber) async {
-    final response = await http.get(
-        Uri.parse('http://api.alquran.cloud/v1/quran/quran-uthmani'));
-
+  static Future<SurahResponseModel> fetchQuranArabicInfo(
+      String surahNumber) async {
+    final response = await http.get(Uri.parse(
+        'http://api.alquran.cloud/v1/surah/${surahNumber}/ar.abdulbasitmurattal'));
     if (response.statusCode == 200) {
-      final decodedResponse = jsonDecode(response.body);
-      if (decodedResponse != null &&
-          decodedResponse['data'] != null &&
-          decodedResponse['data']['surahs'] != null &&
-          decodedResponse['data']['surahs'][int.parse(surahNumber) - 1]
-          ['ayahs'] !=
-              null) {
-        return decodedResponse['data']['surahs']
-        [int.parse(surahNumber) - 1]['ayahs'];
-      } else {
-        throw Exception('Surah data not found in response');
-      }
+      return surahResponseModelFromJson(response.body);
     } else {
       throw Exception(
           'Failed to load data. Status code: ${response.statusCode}');
     }
   }
 
-  static Future<List<dynamic>> fetchQuranEnglishInfo(String surahNumber) async {
+  static Future<SurahEnResponseModel> fetchQuranEnglishInfo(
+      String surahNumber) async {
     final response = await http.get(
-        Uri.parse('http://api.alquran.cloud/v1/quran/en.asad'));
-
+        Uri.parse('http://api.alquran.cloud/v1/surah/${surahNumber}/en.asad'));
     if (response.statusCode == 200) {
-      final decodedResponse = jsonDecode(response.body);
-      if (decodedResponse != null &&
-          decodedResponse['data'] != null &&
-          decodedResponse['data']['surahs'] != null &&
-          decodedResponse['data']['surahs'][int.parse(surahNumber) - 1]
-          ['ayahs'] !=
-              null) {
-        return decodedResponse['data']['surahs']
-        [int.parse(surahNumber) - 1]['ayahs'];
-      } else {
-        throw Exception('Surah data not found in response');
-      }
+      return surahEnResponseModelFromJson(response.body);
     } else {
       throw Exception(
           'Failed to load data. Status code: ${response.statusCode}');
